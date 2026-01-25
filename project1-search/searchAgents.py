@@ -40,6 +40,7 @@ from game import Actions
 import util
 import time
 import search
+from itertools import permutations
 
 class GoWestAgent(Agent):
     "An agent that goes West until it can't."
@@ -371,7 +372,23 @@ def cornersHeuristic(state, problem):
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
 
     "*** YOUR CODE HERE ***"
-    return 0 # Default to trivial solution
+    position, visitedCorners = state
+
+    # Get unvisited corners
+    unvisited = [corners[i] for i in range(4) if not visitedCorners[i]]
+
+    if not unvisited:
+        return 0
+
+    # Find minimum Manhattan distance "tour" out of all possible orderings
+    min_cost = float('inf')
+    for permutation in permutations(unvisited):
+        cost = util.manhattanDistance(position, permutation[0])
+        for i in range(len(permutation) - 1):
+            cost += util.manhattanDistance(permutation[i], permutation[i + 1])
+        min_cost = min(min_cost, cost)
+
+    return min_cost
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
