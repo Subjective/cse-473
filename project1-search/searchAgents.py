@@ -482,7 +482,28 @@ def foodHeuristic(state, problem):
     """
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
-    return 0
+    foodList = foodGrid.asList()
+
+    if not foodList:
+        return 0
+
+    # cache maze distances to avoid repeated BFS
+    if 'distanceCache' not in problem.heuristicInfo:
+        problem.heuristicInfo['distanceCache'] = {}
+
+    cache = problem.heuristicInfo['distanceCache']
+
+    # Heuristic: maze distance to the farthest food
+    # Admissible because we must at least reach the farthest food
+    maxDist = 0
+    for food in foodList:
+        key = (position, food)
+        if key not in cache:
+            cache[key] = mazeDistance(position, food, problem.startingGameState)
+        maxDist = max(maxDist, cache[key])
+
+    return maxDist
+
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
