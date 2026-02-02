@@ -348,10 +348,52 @@ def betterEvaluationFunction(currentGameState):
     Your extreme ghost-hunting, pellet-nabbing, food-gobbling, unstoppable
     evaluation function (question 5).
 
-    DESCRIPTION: <write something here so we know what you did>
+    DESCRIPTION: My implementation considers the following factors and weights them by importance:
+    - Game score as baseline
+    - Reciprocal of closest food distance (encourages eating nearby food)
+    - Penalty for remaining food count (encourages clearing the board)
+    - Ghost avoidance (heavy penalty for being near dangerous ghosts)
+    - Ghost hunting (reward for being near scared ghosts)
+    - Penalty for remaining capsules (encourages eating power pellets)
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    if currentGameState.isWin():
+        return float("inf")
+    if currentGameState.isLose():
+        return float("-inf")
+
+    pacmanPos = currentGameState.getPacmanPosition()
+    foodList = currentGameState.getFood().asList()
+    ghostStates = currentGameState.getGhostStates()
+    capsules = currentGameState.getCapsules()
+
+    score = currentGameState.getScore()
+
+    # Reward being close to food
+    if foodList:
+        minFoodDist = min(manhattanDistance(pacmanPos, food) for food in foodList)
+        score += 10 / (minFoodDist + 1)
+    # Small penalty for remaining food (negligible compared to other factors)
+    score -= 4 * len(foodList)
+
+    # Avoid dangerous ghosts, chase scared ones
+    for ghostState in ghostStates:
+        ghostPos = ghostState.getPosition()
+        ghostDist = manhattanDistance(pacmanPos, ghostPos)
+        scaredTime = ghostState.scaredTimer
+
+        if scaredTime > 0:
+            # Chase scared ghost
+            score += 200 / (ghostDist + 1)
+        else:
+            # Dangerous ghost too close: impose heavy penalty
+            if ghostDist < 2:
+                score -= 500
+
+    # Capsules: slight penalty for not eating them (negligible compared to other factors)
+    score -= 20 * len(capsules)
+
+    return score
 
 
 # Abbreviation
