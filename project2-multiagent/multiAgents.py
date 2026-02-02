@@ -162,7 +162,54 @@ class MinimaxAgent(MultiAgentSearchAgent):
         Returns whether or not the game state is a losing state
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+
+        def minimax(state, depth, agentIndex):
+            # Terminal states: win, lose, or depth limit reached
+            if state.isWin() or state.isLose() or depth == 0:
+                return self.evaluationFunction(state)
+
+            numAgents = state.getNumAgents()
+            legalActions = state.getLegalActions(agentIndex)
+            nextAgent = (agentIndex + 1) % numAgents
+            # Depth decreases only after all agents have moved (back to Pacman)
+            nextDepth = depth - 1 if nextAgent == 0 else depth
+
+            if agentIndex == 0:  # pacman: MAX player
+                return max(
+                    minimax(
+                        state.generateSuccessor(agentIndex, action),
+                        nextDepth,
+                        nextAgent,
+                    )
+                    for action in legalActions
+                )
+            else:  # ghost: MIN player
+                return min(
+                    minimax(
+                        state.generateSuccessor(agentIndex, action),
+                        nextDepth,
+                        nextAgent,
+                    )
+                    for action in legalActions
+                )
+
+        # Find the best action for Pacman (agent 0)
+        legalActions = gameState.getLegalActions(0)
+        numAgents = gameState.getNumAgents()
+        nextAgent = 1 % numAgents
+        nextDepth = self.depth - 1 if nextAgent == 0 else self.depth
+
+        bestAction = None
+        bestValue = float("-inf")
+
+        for action in legalActions:
+            successor = gameState.generateSuccessor(0, action)
+            value = minimax(successor, nextDepth, nextAgent)
+            if value > bestValue:
+                bestValue = value
+                bestAction = action
+
+        return bestAction
 
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
