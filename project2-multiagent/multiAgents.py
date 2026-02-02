@@ -292,7 +292,55 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
         legal moves.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+
+        def expectimax(state, depth, agentIndex):
+            # Terminal states: win, lose, or depth limit reached
+            if state.isWin() or state.isLose() or depth == 0:
+                return self.evaluationFunction(state)
+
+            numAgents = state.getNumAgents()
+            legalActions = state.getLegalActions(agentIndex)
+            nextAgent = (agentIndex + 1) % numAgents
+            # Depth decreases only after all agents have moved (back to Pacman)
+            nextDepth = depth - 1 if nextAgent == 0 else depth
+
+            if agentIndex == 0:  # pacman: MAX player
+                return max(
+                    expectimax(
+                        state.generateSuccessor(agentIndex, action),
+                        nextDepth,
+                        nextAgent,
+                    )
+                    for action in legalActions
+                )
+            else:  # ghost: CHANCE node
+                values = [
+                    expectimax(
+                        state.generateSuccessor(agentIndex, action),
+                        nextDepth,
+                        nextAgent,
+                    )
+                    for action in legalActions
+                ]
+                return sum(values) / len(values)
+
+        # Find the best action for Pacman (agent 0)
+        legalActions = gameState.getLegalActions(0)
+        numAgents = gameState.getNumAgents()
+        nextAgent = 1 % numAgents
+        nextDepth = self.depth - 1 if nextAgent == 0 else self.depth
+
+        bestAction = None
+        bestValue = float("-inf")
+
+        for action in legalActions:
+            successor = gameState.generateSuccessor(0, action)
+            value = expectimax(successor, nextDepth, nextAgent)
+            if value > bestValue:
+                bestValue = value
+                bestAction = action
+
+        return bestAction
 
 
 def betterEvaluationFunction(currentGameState):
