@@ -222,7 +222,61 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         Returns the minimax action using self.depth and self.evaluationFunction
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+
+        def alphaBeta(state, depth, agentIndex, alpha, beta):
+            # Terminal states: win, lose, or depth limit reached
+            if state.isWin() or state.isLose() or depth == 0:
+                return self.evaluationFunction(state)
+
+            numAgents = state.getNumAgents()
+            legalActions = state.getLegalActions(agentIndex)
+            nextAgent = (agentIndex + 1) % numAgents
+            # Depth decreases only after all agents have moved (back to Pacman)
+            nextDepth = depth - 1 if nextAgent == 0 else depth
+
+            if agentIndex == 0:  # pacman: MAX player
+                value = float("-inf")
+                for action in legalActions:
+                    successor = state.generateSuccessor(agentIndex, action)
+                    value = max(
+                        value, alphaBeta(successor, nextDepth, nextAgent, alpha, beta)
+                    )
+                    if value > beta:  # Prune
+                        return value
+                    alpha = max(alpha, value)
+                return value
+            else:  # ghost: MIN player
+                value = float("inf")
+                for action in legalActions:
+                    successor = state.generateSuccessor(agentIndex, action)
+                    value = min(
+                        value, alphaBeta(successor, nextDepth, nextAgent, alpha, beta)
+                    )
+                    if value < alpha:  # Prune
+                        return value
+                    beta = min(beta, value)
+                return value
+
+        # Find the best action for Pacman (agent 0)
+        legalActions = gameState.getLegalActions(0)
+        numAgents = gameState.getNumAgents()
+        nextAgent = 1 % numAgents
+        nextDepth = self.depth - 1 if nextAgent == 0 else self.depth
+
+        alpha = float("-inf")
+        beta = float("inf")
+        bestAction = None
+        bestValue = float("-inf")
+
+        for action in legalActions:
+            successor = gameState.generateSuccessor(0, action)
+            value = alphaBeta(successor, nextDepth, nextAgent, alpha, beta)
+            if value > bestValue:
+                bestValue = value
+                bestAction = action
+            alpha = max(alpha, value)
+
+        return bestAction
 
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
