@@ -157,6 +157,9 @@ def choose_next_action(
             The chosen action.
     """
     # *** BEGIN OF YOUR CODE ***
+    best_q_value = max(q_table[(state, action)] for action in mdp.actions)
+    best_actions = [action for action in mdp.actions if q_table[(state, action)] == best_q_value]
+    return epsilon_greedy(best_actions, epsilon)
 
 
 def custom_epsilon(n_step: int) -> float:
