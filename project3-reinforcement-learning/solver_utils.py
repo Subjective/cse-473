@@ -101,6 +101,10 @@ def q_update(
     """
     state, action, reward, next_state = transition
     # *** BEGIN OF YOUR CODE ***
+    old_q_value = q_table[(state, action)]
+    next_state_best_q = max(q_table[(next_state, next_action)] for next_action in mdp.actions) if next_state != mdp.terminal else 0
+    # formula from lecture slides: Q(S, A) <- (1 - alpha) * Q(S, A) + alpha * (R + gamma * max_a' Q(S', a'))
+    q_table[(state, action)] = (1.0 - alpha) * old_q_value + alpha * (reward + mdp.config.gamma * next_state_best_q)
 
 
 def extract_v_table(mdp: tm.TohMdp, q_table: tm.QTable) -> tm.VTable:
