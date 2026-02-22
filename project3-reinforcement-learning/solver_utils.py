@@ -33,6 +33,29 @@ def value_iteration(
     # noinspection PyUnusedLocal
     max_delta = 0.0
     # *** BEGIN OF YOUR CODE ***
+    # bellman update: U(s) = max_a sum_s' T(s, a, s') * (R(s, a, s') + gamma * U(s'))
+    for state in mdp.nonterminal_states:
+        best_q_value = float("-inf")
+
+        for action in mdp.actions:
+            q_value = 0.0
+            for next_state in mdp.all_states:
+                transition_probability = mdp.transition(state, action, next_state)
+                if transition_probability == 0.0:  # skip invalid next states
+                    continue
+
+                reward = mdp.reward(state, action, next_state)
+                q_value += transition_probability * (
+                    reward + mdp.config.gamma * v_table[next_state]
+                )
+
+            q_table[(state, action)] = q_value
+            if q_value > best_q_value:
+                best_q_value = q_value
+
+        new_v_table[state] = best_q_value
+        delta = abs(new_v_table[state] - v_table[state])
+        max_delta = max(max_delta, delta)
     # ***  END OF YOUR CODE  ***
     return new_v_table, q_table, max_delta
 
