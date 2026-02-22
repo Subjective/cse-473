@@ -175,6 +175,7 @@ def custom_epsilon(n_step: int) -> float:
             epsilon value when choosing the nth step.
     """
     # *** BEGIN OF YOUR CODE ***
+    return 1 / (.001 * n_step)  # epsilon decreases over time
 
 
 def custom_alpha(n_step: int) -> float:
