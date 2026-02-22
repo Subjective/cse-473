@@ -119,6 +119,11 @@ def extract_v_table(mdp: tm.TohMdp, q_table: tm.QTable) -> tm.VTable:
             The extracted value table.
     """
     # *** BEGIN OF YOUR CODE ***
+    v_table = {}
+    for state in mdp.nonterminal_states:
+        v_table[state] = max(q_table[(state, action)] for action in mdp.actions)
+    v_table[mdp.terminal] = 0.0
+    return v_table
 
 
 def choose_next_action(
