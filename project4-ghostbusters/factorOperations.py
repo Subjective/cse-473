@@ -111,10 +111,25 @@ def joinFactors(factors: ValuesView[Factor]):
                     "Input factors: \n" +
                     "\n".join(map(str, factors)))
 
+    factors = list(factors)
+    unconditioned = set()
+    conditioned = set()
 
-    "*** YOUR CODE HERE ***"
-    raiseNotDefined()
-    "*** END YOUR CODE HERE ***"
+    for factor in factors:
+        unconditioned |= factor.unconditionedVariables()
+        conditioned |= factor.conditionedVariables()
+
+    conditioned -= unconditioned
+
+    joinedFactor = Factor(unconditioned, conditioned, factors[0].variableDomainsDict())
+
+    for assignment in joinedFactor.getAllPossibleAssignmentDicts():
+        probability = 1.0
+        for factor in factors:
+            probability *= factor.getProbability(assignment)
+        joinedFactor.setProbability(assignment, probability)
+
+    return joinedFactor
 
 ########### ########### ###########
 ########### QUESTION 3  ###########
