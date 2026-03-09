@@ -593,9 +593,15 @@ class ExactInference(InferenceModule):
         Pacman's current position. However, this is not a problem, as Pacman's
         current position is known.
         """
-        "*** YOUR CODE HERE ***"
-        raiseNotDefined()
-        "*** END YOUR CODE HERE ***"
+        updatedBeliefs = DiscreteDistribution()
+
+        for oldPosition in self.allPositions:
+            oldProbability = self.beliefs[oldPosition]
+            newPositionDistance = self.getPositionDistribution(gameState, oldPosition)
+            for newPosition, probability in newPositionDistance.items():
+                updatedBeliefs[newPosition] += oldProbability * probability
+
+        self.beliefs = updatedBeliefs
 
     def getBeliefDistribution(self):
         return self.beliefs
