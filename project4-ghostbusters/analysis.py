@@ -16,14 +16,17 @@
 # ANALYSIS QUESTIONS #
 ######################
 
+
 def question0():
     # This should be an integer greater than zero
     hoursWorked = 12
     return hoursWorked
 
-if __name__ == '__main__':
-    print('Answers to analysis questions:')
+
+if __name__ == "__main__":
+    print("Answers to analysis questions:")
     import analysis
-    for q in [q for q in dir(analysis) if q.startswith('question')]:
+
+    for q in [q for q in dir(analysis) if q.startswith("question")]:
         response = getattr(analysis, q)()
-        print('  Question %s:\t%s' % (q, str(response)))
+        print("  Question %s:\t%s" % (q, str(response)))
